@@ -89,7 +89,7 @@ print(df.info())
 
 print('\n[describe] / 숫자 컬럼 요약')
 num_cols = ['나이', 'SBP(수축기)', 'DBP(이완기)', '심박수', '공복혈당', '운동빈도(주)']
-print(df[num_cols].describe)
+print(df[num_cols].describe())
 
 
 # =====================================
@@ -296,9 +296,9 @@ print(gender_mean)
 - pd.cut() : 숫자를 구간으로 나눠 범주형 컬럼 생성
 '''
 
-bins = [0, 29, 39, 49, 59, 120]
-labels = ['20대', '30대', '40대', '50대', '60대이상']
-df['나이대'] = pd.cut(df['나이'], bins=bins, labels=labels, right=True)
+bins = [0, 19, 29, 39, 49, 59, 100]
+labels = ['10대 이하', '20대', '30대', '40대', '50대', '60대 이상']
+df['나이대'] = pd.cut(df['나이'], bins=bins, labels=labels, right=True, include_lowest=True)
 
 age_group = df.groupby('나이대')[['SBP(수축기)', 'DBP(이완기)', '공복혈당', 'BMI']].mean()
 print('\[나이대별 평균]')
