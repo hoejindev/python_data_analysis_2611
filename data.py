@@ -613,10 +613,10 @@ print(bp_ratio.round(1))# 소수점 한 자리까지만 표시
 # 6-2) 위험 신호 : 공복혈당 평균과 126 이상 비율
 # ---------------------------------------------------
 mean_glu = df['공복혈당'].mean()
-high_glu_ration = (df['공복혈당'] >= 126).mean() * 100 #True = 1, False = 0
+high_glu_ratio = (df['공복혈당'] >= 126).mean() * 100 #True = 1, False = 0
 
 print(f'\n[공복혈당 평균 : {mean_glu: .2f} mg/dL]')
-print(f'[공복혈당 126 이상 비율 : {high_glu_ration: .1f}%]')
+print(f'[공복혈당 126 이상 비율 : {high_glu_ratio: .1f}%]')
 
 # ---------------------------------------------------
 # 6-3) 운동빈도와 주요 지표 관계
@@ -643,7 +643,7 @@ obesity_ratio = (df['BMI분류'] == '비만').mean() * 100
 stratege.append(f'BMI 기준 비만 비율이 {obesity_ratio: .1f}%로 확인되어 체중관리(식습관+운동) 프로그램을 고려할 수 있습니다.')
 
 # 혈당 고위험 비율 고멘트
-if high_glu_ration > 20:
+if high_glu_ratio > 20:
     stratege.append('공복혈당 126 이상 비율이 꽤 있어, 혈당 관련 추가 검사/상담 연계를 고려할 수 있습니다.')
 else:
     stratege.append('공복혈당 고위험 비율이 높진 않지만, 식습관/활동량 관련 기본 가이드를 제공하면 좋습니다.')
@@ -661,7 +661,7 @@ for s in stratege:
 high_risk = df[df['위험점수'] >=2]
 high_risk_ratio = (len(high_risk) / len(df)) * 100
 
-print(f'\n [고위험군 비율 (위험점수 2 이상)] : {high_glu_ration: .1f}%')
+print(f'\n [고위험군 비율 (위험점수 2 이상)] : {high_glu_ratio: .1f}%')
 print('[고위험군 목록]')
 print(high_risk[['환자ID', 'BMI', '공복혈당', '혈압분류', '위험점수']])
 
@@ -687,10 +687,10 @@ print(top_risk[['환자ID', 'BMI', '공복혈당', '혈압분류', '위험점수
 - 혈당 위험 비율
 '''
 
-if (high_risk_ratio > 30) or ( high_glu_ration > 30):
+if (high_risk_ratio > 30) or ( high_glu_ratio > 30):
     health_level ='위험'
 
-elif (high_risk_ratio > 15) or ( high_glu_ration > 15):
+elif (high_risk_ratio > 15) or ( high_glu_ratio > 15):
     health_level ='주의'
 
 else:
@@ -698,3 +698,45 @@ else:
 
 print(f'\n[전체 건강 상태 평가] => {health_level}')
 
+# ========================================
+# [7] 저장
+# ========================================
+
+print('========================================')
+print('7) 저장')
+print('========================================')
+'''
+to_csv() 저장
+- index=False : 행 인덱스(0, 1, 2 ...)f를 파일에 저장하지 않음
+- encoding="utf=8-sig" : 엑셀에서 한글 깨짐 방지(윈도우 환경에서 유용)
+'''
+
+# -------------------------------------------------
+# 7-1) 고위험군 데이터 따로 저장
+# -------------------------------------------------
+high_risk.to_csv('high_risk_patients.csv', index=False, encoding='utf-8-sig')
+print('고위험군 파일 저장 완료')
+
+
+# -------------------------------------------------
+# 7-2) 분석 요약 결과 저장
+# -------------------------------------------------
+summary = {
+    '전체 인원' : len(df),
+    '고위험군 비율(%)' : round(high_risk_ratio, 1),
+    '공복혈당 평균' : round(mean_glu, 2),
+    '공복혈당 위험 비율(%)' : round(high_glu_ratio, 1),
+    '전체 건강 상태' : health_level,
+}
+
+summary_df = pd.DataFrame([summary])
+summary_df.to_csv('analysis_summary.csv', index=False, encoding='utf-8-sig')
+print('분석 요약 파일 저장 완료')
+
+
+# -------------------------------------------------
+# 7-3) 통합 저장
+# -------------------------------------------------
+df.to_csv('medical_basic_analysis_result.csv', index=False, encoding='utf-8-sig')
+print('통합 파일 저장 완료')
+print('\n프로젝트 종료!')
